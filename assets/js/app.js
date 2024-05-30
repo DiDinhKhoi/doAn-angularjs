@@ -1,4 +1,5 @@
 var app = angular.module('myApp', []);
+
 app.controller('AppCtrl', function ($scope, $window) {
     $scope.isLogin = false;
     $scope.imageSrc = '';
@@ -111,7 +112,6 @@ app.controller('AppCtrl', function ($scope, $window) {
         $(modalId).modal('show');
     };
 
-
     $scope.updatedUsers = function (index) {
         console.log(index)
 
@@ -155,13 +155,13 @@ app.controller('AppCtrl', function ($scope, $window) {
             $window.alert('Cập Nhật Thành công');
             $(modalId).modal('hide');
         }
-
-
     };
+
     $scope.openDeleteModal = function (user) {
         $scope.userToDelete = user;
         $('#deleteModal').modal('show');
     };
+
     $scope.deleteUser = function () {
         //tìm vị trí của người dùng cần xóa trong mảng $scope.datas bằng cách sử dụng hàm indexOf
         var index = $scope.datas.indexOf($scope.userToDelete);
@@ -183,12 +183,11 @@ app.controller('AppCtrl', function ($scope, $window) {
         var emailMatch = item.email.toLowerCase().includes(searchTerm);
         return nameMatch || emailMatch;
     };
+
     $scope.view_user = function (item) {
         $scope.abc = item;
         $('#viewModal').modal('show');
     }
-
-
 
     // =============== Products =============================
     $scope.addProduct = function () {
@@ -200,8 +199,7 @@ app.controller('AppCtrl', function ($scope, $window) {
         }
 
         var product = {
-            products_name: $scope.products_name,
-            products_tacgia: $scope.products_tacgia,
+            products_name: $scope.products_name,      
             products_image: $scope.imageProduct,
             products_description: $scope.products_description,
             products_price: $scope.products_price
@@ -212,28 +210,28 @@ app.controller('AppCtrl', function ($scope, $window) {
         localStorage.setItem('product-list', angular.toJson($scope.datas_products));
         console.log($scope.datas_products);
     }
-    $scope.openProduct = function (index, product) {
 
+    $scope.openProduct = function (index, product) {
         console.log(index);
         $scope.productId = angular.copy(product);
         console.log($scope.productId);
         localStorage.setItem('productId', angular.toJson($scope.productId));
-
     };
+
     $scope.openDeleteProducts = function (product) {
         $scope.productsToDelete = product;
         $('#deleteModal').modal('show');
     };
+
     $scope.deleteProducts = function () {
-        //tìm vị trí của người dùng cần xóa trong mảng $scope.datas bằng cách sử dụng hàm indexOf
         var index = $scope.datas_products.indexOf($scope.productsToDelete);
-        //kiểm tra xem người dùng cần xóa có tồn tại trong mảng hay không
         if (index > -1) {
             $scope.datas_products.splice(index, 1);
             localStorage.setItem('product-list', angular.toJson($scope.datas_products));
         }
         $('#deleteModal').modal('hide');
     };
+
     $scope.customProducts = function (item) {
         if (!$scope.search_products) {
             return true; // Hiển thị tất cả các phần tử nếu không có giá trị tìm kiếm
@@ -241,41 +239,59 @@ app.controller('AppCtrl', function ($scope, $window) {
         var searchTerm = $scope.search_products.toLowerCase();
         var nameMatch = item.products_name.toLowerCase().includes(searchTerm);
         var tacgiaMatch = item.products_tacgia.toLowerCase().includes(searchTerm);
-        console.log(item.product_name)
         return nameMatch || tacgiaMatch;
     };
+
     $scope.view_Products = function (item) {
         $scope.def = item;
         $('#viewModal').modal('show');
     }
 
-
+    //sửa sản phẩm 
+    $scope.openEditProductModal = function (index, product) {
+        // Lấy thông tin sản phẩm cần sửa và gán vào biến updatedProduct
+        $scope.updatedProduct = angular.copy(product);
+    
+        // Mở modal sửa sản phẩm
+        var modalId = '#editProductModal' + index;
+        $(modalId).modal('show');
+    };
+    
+    $scope.updatedProductDetails = function (index) {
+        // Cập nhật thông tin sản phẩm sau khi sửa
+        // Xử lý logic cập nhật ở đây, ví dụ:
+        $scope.datas_products[index] = angular.copy($scope.updatedProduct);
+    
+        // Lưu danh sách sản phẩm đã cập nhật vào localStorage
+        localStorage.setItem('product-list', angular.toJson($scope.datas_products));
+    
+        // Đóng modal sau khi cập nhật thành công
+        var modalId = '#editProductModal' + index;
+        $(modalId).modal('hide');
+        alert('Cập nhật sản phẩm thành công!');
+    };
+    
+    //
+    
 
     // =============== CARTS =============================
-
     $scope.addToCart = function () {
         let quantity = document.querySelector('#quantity').value;
 
-        // Kiểm tra kiểu dữ liệu của quantity
         if (typeof quantity === 'string') {
-            // Kiểm tra nếu quantity là một chuỗi, hãy chuyển đổi nó thành số nguyên
             quantity = parseInt(quantity);
         }
 
-        // Kiểm tra nếu quantity là một số nguyên
         if (Number.isInteger(quantity)) {
             $scope.productId.quantity = quantity;
 
-            // Kiểm tra xem sản phẩm đã tồn tại trong carts chưa
             let existingProduct = $scope.carts.find(function (product) {
                 return product.products_name === $scope.productId.products_name;
             });
 
             if (existingProduct) {
-                // Nếu sản phẩm đã tồn tại, cộng giá trị quantity
                 existingProduct.quantity += quantity;
             } else {
-                // Nếu sản phẩm chưa tồn tại, thêm vào carts
                 var Cart = angular.copy($scope.productId);
                 $scope.carts.push(Cart);
             }
@@ -286,6 +302,7 @@ app.controller('AppCtrl', function ($scope, $window) {
             console.log('Quantity must be an integer.');
         }
     }
+
     $scope.openDeleteCart = function (item) {
         $scope.CartToDelete = item;
         $('#deleteModal').modal('show');
@@ -310,14 +327,14 @@ app.controller('AppCtrl', function ($scope, $window) {
         localStorage.setItem('cart-list', angular.toJson($scope.carts));
         console.log($scope.carts[index]);
         $scope.calculateTotalPrice();
-
     }
+
     $scope.calculateTotalPrice = function () {
         $scope.totalPrice = 0;
         for (let i = 0; i < $scope.carts.length; i++) {
             $scope.totalPrice += $scope.carts[i].products_price * $scope.carts[i].quantity;
         }
     }
+
     $scope.calculateTotalPrice();
 });
-
